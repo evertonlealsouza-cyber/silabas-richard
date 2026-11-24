@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2E9A96" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Mundo das Sílabas do Richard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      /* Paleta inspirada em estilo Montessori / BrightStart: calorosa, limpa e alegre */
+      --bg-ivory: #FAF8F3;
+      --bg-cream: #F4EFE4;
+      --card-white: #FFFFFF;
+      --card-border: #EAE2D3;
+      --ink-navy: #1E2D40;
+      --ink-muted: #5A6B7C;
+
+      /* Consoantes & Ações Principais — Verde-Água (Teal) */
+      --teal-a: #38ADA9;
+      --teal-b: #2A928E;
+      --teal-shadow: #1F726F;
+      --teal-soft: #E6F5F4;
+      --teal-border: #A8DCD9;
+
+      /* Vogais & Destaques Quentes — Coral */
+      --coral-a: #F18B72;
+      --coral-b: #E56F54;
+      --coral-shadow: #C2533A;
+      --coral-soft: #FDF0EC;
+      --coral-border: #F7C5B8;
+
+      /* Sílaba Formada & Acerto — Verde Folha */
+      --sage-a: #74C187;
+      --sage-b: #57A96D;
+      --sage-shadow: #3E8451;
+      --sage-soft: #EDF8F0;
+      --sage-border: #B3E0BF;
+
+      /* Estrelas & Dicas — Amarelo Sol */
+      --sun-a: #F7CE65;
+      --sun-b: #EAB83F;
+      --sun-shadow: #C6931E;
+      --sun-soft: #FEF8E7;
+      --sun-border: #F5DC93;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Nunito', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 96% 8%, rgba(247, 206, 101, 0.32), transparent 32%),
+        radial-gradient(circle at 4% 16%, rgba(56, 173, 169, 0.12), transparent 34%),
+        radial-gradient(circle at 88% 92%, rgba(241, 139, 114, 0.14), transparent 36%),
+        radial-gradient(circle at 12% 88%, rgba(116, 193, 135, 0.14), transparent 36%),
+        var(--bg-ivory);
+      color: var(--ink-navy);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      touch-action: manipulation;
+    }
+
+    .font-display {
+      font-family: 'Fredoka', 'Nunito', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    button {
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Cartões limpos com borda areia suave */
+    .app-card {
+      background: var(--card-white);
+      border: 2px solid var(--card-border);
+      box-shadow:
+        0 10px 26px -12px rgba(30, 45, 64, 0.10),
+        0 2px 6px rgba(30, 45, 64, 0.03);
+    }
+
+    .stage-card {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(254, 248, 231, 0.9), transparent 62%),
+        var(--card-white);
+    }
+
+    /* Botões táteis 3D */
+    .btn-3d {
+      position: relative;
+      transition: transform 0.11s ease, box-shadow 0.11s ease, filter 0.15s ease;
+    }
+    .btn-3d:hover {
+      filter: brightness(1.03);
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+    }
+
+    /* Consoantes — Teal */
+    .tile-consonant {
+      background: linear-gradient(180deg, var(--teal-a) 0%, var(--teal-b) 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 var(--teal-shadow), 0 8px 14px rgba(42, 146, 142, 0.20), inset 0 2px 0 rgba(255, 255, 255, 0.28);
+    }
+    .tile-consonant:active {
+      box-shadow: 0 2px 0 var(--teal-shadow);
+    }
+    .tile-consonant.selected {
+      background: linear-gradient(180deg, #217C78 0%, #1B6865 100%);
+      box-shadow: 0 2px 0 #14504E, 0 0 0 4px rgba(56, 173, 169, 0.34);
+      transform: translateY(2px);
+    }
+
+    /* Vogais — Coral */
+    .tile-vowel {
+      background: linear-gradient(180deg, var(--coral-a) 0%, var(--coral-b) 100%);
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(154, 52, 30, 0.28);
+      box-shadow: 0 5px 0 var(--coral-shadow), 0 8px 14px rgba(229, 111, 84, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.32);
+    }
+    .tile-vowel:active {
+      box-shadow: 0 2px 0 var(--coral-shadow);
+    }
+    .tile-vowel.selected {
+      background: linear-gradient(180deg, #D95E42 0%, #C24D33 100%);
+      box-shadow: 0 2px 0 #9A3A24, 0 0 0 4px rgba(241, 139, 114, 0.42);
+      transform: translateY(2px);
+    }
+
+    /* Botão Principal — Teal */
+    .btn-teal {
+      background: linear-gradient(180deg, var(--teal-a) 0%, var(--teal-b) 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 var(--teal-shadow), 0 10px 18px rgba(42, 146, 142, 0.24), inset 0 2px 0 rgba(255, 255, 255, 0.28);
+    }
+    .btn-teal:active {
+      box-shadow: 0 2px 0 var(--teal-shadow);
+    }
+
+    /* Botão Secundário — Amarelo Sol */
+    .btn-sun {
+      background: linear-gradient(180deg, var(--sun-a) 0%, var(--sun-b) 100%);
+      color: #4A3407;
+      box-shadow: 0 5px 0 var(--sun-shadow), 0 10px 18px rgba(234, 184, 63, 0.26), inset 0 2px 0 rgba(255, 255, 255, 0.42);
+    }
+    .btn-sun:active {
+      box-shadow: 0 2px 0 var(--sun-shadow);
+    }
+
+    /* Botão Coral (Próxima palavra / destaque) */
+    .btn-coral {
+      background: linear-gradient(180deg, var(--coral-a) 0%, var(--coral-b) 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 var(--coral-shadow), 0 10px 18px rgba(229, 111, 84, 0.24), inset 0 2px 0 rgba(255, 255, 255, 0.30);
+    }
+    .btn-coral:active {
+      box-shadow: 0 2px 0 var(--coral-shadow);
+    }
+
+    /* Cartão da Sílaba Formada — Verde Folha */
+    .result-badge {
+      background: linear-gradient(145deg, var(--sage-a) 0%, var(--sage-b) 100%);
+      box-shadow: 0 6px 0 var(--sage-shadow), 0 14px 24px rgba(87, 169, 109, 0.28), inset 0 3px 0 rgba(255, 255, 255, 0.34);
+    }
+    .result-badge:active {
+      box-shadow: 0 2px 0 var(--sage-shadow);
+    }
+
+    /* Banner de Família Silábica em Teal (estilo faixa BrightStart) */
+    .family-banner {
+      background: linear-gradient(135deg, #2E9A96 0%, #248581 100%);
+      border: 2px solid #227A76;
+      box-shadow: 0 10px 24px -10px rgba(36, 133, 129, 0.35);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.76); opacity: 0.55; }
+      65% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popIn 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes gentleShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: gentleShake 0.4s ease;
+    }
+
+    @keyframes speakPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(87, 169, 109, 0.52); }
+      50% { box-shadow: 0 0 0 13px rgba(87, 169, 109, 0); }
+    }
+    .speaking-pulse {
+      animation: speakPulse 0.85s ease infinite;
+    }
+
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    .float-soft {
+      animation: floatSoft 3.2s ease-in-out infinite;
+    }
+
+    .letter-slot {
+      transition: all 0.16s ease;
+      box-shadow: inset 0 3px 6px rgba(30, 45, 64, 0.05);
+    }
+    .letter-slot.filled-slot {
+      background: linear-gradient(180deg, #ffffff 0%, #FAF8F3 100%);
+      box-shadow: 0 4px 0 #DDD5C4;
+    }
+    .letter-slot.active-slot {
+      border-color: var(--teal-b);
+      background-color: var(--teal-soft);
+      box-shadow: 0 0 0 4px rgba(42, 146, 142, 0.22);
+      transform: translateY(-2px);
+    }
+    .letter-slot.slot-correct {
+      border-color: var(--sage-b);
+      background: linear-gradient(180deg, #EDF8F0 0%, #D9F2DF 100%);
+      color: #2E6E40;
+      box-shadow: 0 4px 0 #8CD09E;
+    }
+    .letter-slot.slot-wrong {
+      border-color: var(--coral-b);
+      background: linear-gradient(180deg, #FDF0EC 0%, #FBE0D8 100%);
+      color: #B43E24;
+      box-shadow: 0 4px 0 #F2A896;
+    }
+
+    /* =========================================================
+       OTIMIZAÇÃO DEDICADA PARA MOBILE NA HORIZONTAL (LANDSCAPE)
+       ========================================================= */
+    @media (orientation: landscape) and (max-height: 540px) {
+      .app-shell {
+        max-width: 100% !important;
+        padding: 6px 10px 8px !important;
+      }
+
+      .app-header {
+        padding: 7px 12px !important;
+        margin-bottom: 8px !important;
+        border-radius: 18px !important;
+      }
+
+      .header-top-row {
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+      }
+
+      .brand-subtitle,
+      .stage-greeting,
+      .vowel-tip-box,
+      .kb-desktop-hint,
+      .word-dots-wrap {
+        display: none !important;
+      }
+
+      .brand-icon {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 10px !important;
+      }
+      .brand-icon svg {
+        width: 24px !important;
+        height: 24px !important;
+      }
+      .brand-title {
+        font-size: 0.95rem !important;
+        white-space: nowrap;
+      }
+
+      .header-nav-bar {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        border-top: 0 !important;
+        width: auto !important;
+      }
+
+      .header-combined {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+      }
+
+      .mode-tabs {
+        display: flex !important;
+        width: auto !important;
+        gap: 6px !important;
+      }
+      .mode-tab-btn {
+        padding: 5px 10px !important;
+        font-size: 0.78rem !important;
+        border-radius: 12px !important;
+        white-space: nowrap;
+      }
+
+      .header-controls {
+        gap: 5px !important;
+      }
+      .header-pill-btn {
+        padding: 4px 8px !important;
+        font-size: 0.75rem !important;
+        border-radius: 11px !important;
+      }
+
+      #view-syllables:not(.hidden) {
+        display: grid !important;
+        grid-template-columns: 5fr 7fr !important;
+        gap: 8px !important;
+        align-items: stretch !important;
+      }
+      #view-syllables > * {
+        margin-top: 0 !important;
+      }
+
+      .syl-left-col,
+      .syl-right-col {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+
+      .syl-stage-card {
+        padding: 10px 12px !important;
+        border-radius: 20px !important;
+      }
+      .syl-equation {
+        margin: 4px 0 8px !important;
+        gap: 6px !important;
+      }
+      .syl-eq-box {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 1.75rem !important;
+        border-radius: 14px !important;
+        border-width: 3px !important;
+      }
+      .syl-eq-result {
+        min-width: 78px !important;
+        height: 60px !important;
+        font-size: 2.1rem !important;
+        padding: 0 12px !important;
+        border-radius: 16px !important;
+      }
+      .syl-eq-op {
+        font-size: 1.4rem !important;
+      }
+      .syl-stage-actions {
+        margin-top: 6px !important;
+        gap: 6px !important;
+      }
+      .syl-action-btn {
+        padding: 6px 11px !important;
+        font-size: 0.78rem !important;
+        border-radius: 12px !important;
+      }
+
+      .syl-panel-card {
+        padding: 8px 10px !important;
+        border-radius: 18px !important;
+      }
+      .syl-panel-title {
+        font-size: 0.82rem !important;
+        margin-bottom: 6px !important;
+      }
+      #consonant-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+      }
+      #consonant-grid button,
+      #vowel-grid button {
+        padding: 7px 0 !important;
+        font-size: 1.15rem !important;
+        border-radius: 12px !important;
+      }
+      #family-strip {
+        gap: 6px !important;
+      }
+      #family-strip button {
+        padding: 7px 0 !important;
+        font-size: 1.05rem !important;
+        border-radius: 12px !important;
+      }
+
+      #view-words:not(.hidden) {
+        display: grid !important;
+        grid-template-columns: 4.5fr 7.5fr !important;
+        gap: 8px !important;
+        align-items: stretch !important;
+      }
+      #view-words > * {
+        margin-top: 0 !important;
+      }
+
+      .words-left-col,
+      .words-right-col {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+
+      .word-progress-bar {
+        padding: 6px 10px !important;
+        border-radius: 16px !important;
+      }
+      .word-nav-btn {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.85rem !important;
+      }
+      .word-picture-card {
+        padding: 10px !important;
+        border-radius: 20px !important;
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+      #btn-picture-speak {
+        width: 138px !important;
+        height: 138px !important;
+        padding: 12px !important;
+        border-radius: 20px !important;
+      }
+
+      .word-builder-card {
+        padding: 9px 12px !important;
+        border-radius: 18px !important;
+      }
+      .word-slots-row {
+        gap: 8px !important;
+        justify-content: space-between !important;
+      }
+      .letter-slot {
+        width: 44px !important;
+        height: 48px !important;
+        font-size: 1.55rem !important;
+        border-radius: 12px !important;
+        border-width: 3px !important;
+      }
+      .syl-pill-btn {
+        margin-top: 4px !important;
+        padding: 2px 8px !important;
+        font-size: 0.7rem !important;
+      }
+      #btn-check-word {
+        height: 48px !important;
+        padding: 0 12px !important;
+        font-size: 0.78rem !important;
+        border-radius: 12px !important;
+      }
+      #word-feedback {
+        margin-top: 6px !important;
+        min-height: 38px !important;
+        padding: 5px 10px !important;
+        border-radius: 12px !important;
+      }
+      #word-feedback-text {
+        font-size: 0.76rem !important;
+      }
+
+      .word-kb-card {
+        padding: 8px 10px !important;
+        border-radius: 18px !important;
+      }
+      .word-kb-header {
+        margin-bottom: 6px !important;
+      }
+      #kb-vowels {
+        gap: 6px !important;
+        margin-bottom: 6px !important;
+        max-width: 100% !important;
+      }
+      #kb-consonants {
+        grid-template-columns: repeat(11, minmax(0, 1fr)) !important;
+        gap: 5px !important;
+      }
+      #kb-vowels button,
+      #kb-consonants button {
+        padding: 7px 0 !important;
+        font-size: 1.05rem !important;
+        border-radius: 10px !important;
+      }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-teal-100">
+
+  <!-- Elementos decorativos leves no estilo ilustrado (sol, aviãozinho de papel, estrelinhas) -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
+    <svg class="absolute -top-6 -right-8 w-44 sm:w-64 opacity-45" viewBox="0 0 200 200">
+      <path d="M40,20 C110,-10 190,20 195,95 C200,165 135,195 75,175 C15,155 -10,55 40,20 Z" fill="#F7CE65"/>
+    </svg>
+    <svg class="absolute top-20 left-5 w-16 sm:w-20 opacity-35 text-[#2E9A96]" viewBox="0 0 100 60" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M6 48 Q28 24 44 38 T72 16" stroke-dasharray="4 5"/>
+      <path d="M68 18 L92 8 L82 28 L76 21 Z" fill="#E6F5F4" stroke="currentColor" stroke-linejoin="round"/>
+    </svg>
+    <svg class="absolute bottom-8 left-6 w-10 h-10 opacity-45 text-[#F4C44E]" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <circle cx="20" cy="20" r="7" fill="#FEF8E7"/>
+      <path d="M20 4 V9 M20 31 V36 M4 20 H9 M31 20 H36 M9 9 L12.5 12.5 M27.5 27.5 L31 31 M31 9 L27.5 12.5 M12.5 27.5 L9 31"/>
+    </svg>
+    <svg class="absolute bottom-10 right-8 w-8 h-8 opacity-40 text-[#EB7A5F]" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14 2 9.27l7.1-1.01L12 2z"/>
+    </svg>
+  </div>
+
+  <div class="app-shell max-w-5xl mx-auto px-3 sm:px-6 py-3 sm:py-5">
+
+    <!-- Cabeçalho Personalizado do Richard -->
+    <header class="app-header app-card rounded-3xl p-3 sm:p-4 mb-4">
+      <div class="header-combined flex flex-col gap-3">
+        <!-- Linha 1: Marca + Estrelas + Controles -->
+        <div class="header-top-row flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div class="brand-icon w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-[#38ADA9] to-[#248581] flex items-center justify-center shadow-md shrink-0">
+              <svg viewBox="0 0 64 64" class="w-8 h-8 sm:w-9 sm:h-9" aria-hidden="true">
+                <defs>
+                  <linearGradient id="rocketBody" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#E6F5F4"/>
+                  </linearGradient>
+                </defs>
+                <path d="M32 8 C42 16 46 28 46 42 L18 42 C18 28 22 16 32 8 Z" fill="url(#rocketBody)"/>
+                <circle cx="32" cy="27" r="6" fill="#F7CE65" stroke="#1E2D40" stroke-width="2.2"/>
+                <path d="M18 35 L10 46 L18 44 Z" fill="#EB7A5F"/>
+                <path d="M46 35 L54 46 L46 44 Z" fill="#EB7A5F"/>
+                <path d="M25 43 L32 56 L39 43 Z" fill="#F4C44E"/>
+                <path d="M28 43 L32 51 L36 43 Z" fill="#FFF8DC"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h1 class="brand-title font-display text-base sm:text-2xl font-bold text-[#1E2D40] leading-tight truncate">
+                Mundo das Sílabas do <span class="text-[#EB7A5F]">Richard</span>
+              </h1>
+              <p class="brand-subtitle text-xs sm:text-sm text-[#5A6B7C] font-bold">
+                Junte as letras, ouça os sons e monte palavras!
+              </p>
+            </div>
+          </div>
+
+          <!-- Placar e Controles -->
+          <div class="header-controls flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div id="star-badge" class="header-pill-btn flex items-center gap-1 bg-[#FEF8E7] border-2 border-[#F5DC93] text-[#7A540C] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-2xl font-black text-xs sm:text-base shadow-sm" title="Estrelas conquistadas pelo Richard">
+              <span class="text-base sm:text-lg leading-none" aria-hidden="true">⭐</span>
+              <span id="star-count">0</span>
+            </div>
+
+            <button id="btn-speed" type="button" class="header-pill-btn flex items-center gap-1 bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-extrabold text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl transition cursor-pointer" title="Alterar velocidade da voz">
+              <span id="speed-icon" aria-hidden="true">🐇</span>
+              <span id="speed-label" class="hidden sm:inline">Normal</span>
+            </button>
+
+            <button id="btn-sfx" type="button" class="header-pill-btn flex items-center gap-1 bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-extrabold text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl transition cursor-pointer" title="Ligar ou desligar efeitos sonoros">
+              <span id="sfx-icon" aria-hidden="true">🔊</span>
+              <span class="hidden sm:inline">Sons</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Linha 2: Abas de Navegação + Seletor de Voz -->
+        <div class="header-nav-bar pt-2.5 border-t border-[#EFE9DC] flex flex-wrap items-center justify-between gap-2.5">
+          <div class="mode-tabs grid grid-cols-2 gap-1.5 w-full sm:w-auto sm:flex bg-[#F4EFE4] p-1 rounded-2xl">
+            <button id="tab-syllables" type="button" class="mode-tab-btn btn-3d flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 rounded-xl font-extrabold text-xs sm:text-base cursor-pointer bg-[#2E9A96] text-white shadow-sm">
+              <span aria-hidden="true">🔤</span>
+              <span>1. Sílabas</span>
+            </button>
+            <button id="tab-words" type="button" class="mode-tab-btn btn-3d flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 rounded-xl font-extrabold text-xs sm:text-base cursor-pointer text-[#5A6B7C] hover:text-[#1E2D40]">
+              <span aria-hidden="true">🧩</span>
+              <span>2. Palavras</span>
+            </button>
+          </div>
+
+          <div id="voice-selector-wrap" class="hidden items-center gap-1.5 text-xs text-[#5A6B7C] w-full sm:w-auto justify-end">
+            <label for="voice-select" class="font-extrabold whitespace-nowrap">Voz:</label>
+            <select id="voice-select" class="bg-[#FAF8F3] border border-[#DDD5C4] rounded-xl px-2.5 py-1.5 text-xs font-bold text-[#1E2D40] max-w-[190px] truncate focus:outline-none focus:ring-2 focus:ring-[#2E9A96]"></select>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Aviso amigável caso navegador não suporte Web Speech API -->
+    <div id="speech-warning" class="hidden mb-3 bg-[#FEF8E7] border-2 border-[#F5DC93] text-[#7A540C] rounded-2xl p-3 text-xs sm:text-sm font-bold">
+      Seu navegador não possui suporte nativo à leitura por voz (Web Speech API). Para ouvir os sons das sílabas e palavras, abra no Google Chrome, Microsoft Edge ou Safari.
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODO 1: FÁBRICA DE SÍLABAS                                -->
+    <!-- ========================================================= -->
+    <main id="view-syllables" class="space-y-4">
+
+      <!-- Coluna Esquerda (no landscape) / Topo (no portrait) -->
+      <div class="syl-left-col space-y-4">
+        <!-- Palco da Junção -->
+        <section class="syl-stage-card app-card stage-card rounded-3xl p-4 sm:p-6">
+          <div class="stage-greeting text-center mb-3">
+            <span class="inline-flex items-center gap-1.5 bg-[#E6F5F4] border border-[#A8DCD9] text-[#1F726F] text-xs sm:text-sm font-extrabold px-3.5 py-1 rounded-full">
+              <span aria-hidden="true">☀️</span>
+              <span>Oi, Richard! Junte uma consoante com uma vogal</span>
+            </span>
+          </div>
+
+          <!-- Equação Visual: Consoante + Vogal = Sílaba -->
+          <div class="syl-equation flex items-center justify-center gap-2 sm:gap-5 my-3">
+            <button id="stage-consonant" type="button" class="syl-eq-box btn-3d font-display w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-[#E6F5F4] border-4 border-[#38ADA9] text-[#1F726F] text-3xl sm:text-5xl font-bold flex items-center justify-center cursor-pointer hover:bg-[#D5EEEC] shadow-sm" title="Clique para ouvir a letra">
+              B
+            </button>
+
+            <span class="syl-eq-op font-display text-2xl sm:text-4xl font-bold text-[#C5BCB0] select-none">+</span>
+
+            <button id="stage-vowel" type="button" class="syl-eq-box btn-3d font-display w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-[#FDF0EC] border-4 border-[#F18B72] text-[#C2533A] text-3xl sm:text-5xl font-bold flex items-center justify-center cursor-pointer hover:bg-[#FAE2DA] shadow-sm" title="Clique para ouvir a vogal">
+              A
+            </button>
+
+            <span class="syl-eq-op font-display text-2xl sm:text-4xl font-bold text-[#C5BCB0] select-none">=</span>
+
+            <button id="stage-result" type="button" class="syl-eq-result btn-3d result-badge font-display min-w-[92px] sm:min-w-[144px] h-20 sm:h-28 px-4 sm:px-6 rounded-2xl sm:rounded-3xl text-white text-4xl sm:text-6xl font-bold flex items-center justify-center cursor-pointer border-4 border-[#B3E0BF]" title="Clique para ouvir a sílaba">
+              BA
+            </button>
+          </div>
+
+          <!-- Botões de Repetição e Soletração -->
+          <div class="syl-stage-actions flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mt-4">
+            <button id="btn-speak-syllable" type="button" class="syl-action-btn btn-3d btn-teal font-extrabold text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 cursor-pointer">
+              <span class="text-base sm:text-xl" aria-hidden="true">🔊</span>
+              <span>Ouvir de novo</span>
+            </button>
+
+            <button id="btn-spell-syllable" type="button" class="syl-action-btn btn-3d btn-sun font-extrabold text-xs sm:text-base px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl flex items-center gap-1.5 cursor-pointer">
+              <span class="text-base sm:text-lg" aria-hidden="true">✨</span>
+              <span id="spell-btn-label">Juntar devagar (B + A = BA)</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Família Silábica em faixa Teal acolhedora -->
+        <section class="syl-panel-card family-banner rounded-3xl p-3.5 sm:p-5 text-white">
+          <div class="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+            <h2 class="syl-panel-title font-display text-sm sm:text-lg font-bold text-white flex items-center gap-1.5">
+              <span>Família da letra</span>
+              <span id="family-letter" class="inline-block bg-white/20 border border-white/30 text-white px-2.5 py-0.5 rounded-xl">B</span>
+            </h2>
+            <button id="btn-play-family" type="button" class="btn-3d bg-[#F7CE65] hover:bg-[#F4C44E] text-[#4A3407] font-extrabold text-xs sm:text-sm px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <span aria-hidden="true">▶️</span>
+              <span>Ouvir família</span>
+            </button>
+          </div>
+          <div id="family-strip" class="grid grid-cols-5 gap-2 sm:gap-3.5"></div>
+        </section>
+      </div>
+
+      <!-- Coluna Direita (no landscape) / Base (no portrait): Seletores -->
+      <div class="syl-right-col grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Consoantes -->
+        <section class="syl-panel-card lg:col-span-7 app-card rounded-3xl p-3.5 sm:p-5">
+          <div class="flex items-center justify-between mb-2.5">
+            <h2 class="syl-panel-title font-display text-sm sm:text-lg font-bold text-[#1E2D40] flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#2E9A96] inline-block"></span>
+              1. Escolha a Consoante
+            </h2>
+            <span class="text-[11px] sm:text-xs font-extrabold text-[#8A96A3]">11 letras</span>
+          </div>
+          <div id="consonant-grid" class="grid grid-cols-6 gap-2 sm:gap-3"></div>
+        </section>
+
+        <!-- Vogais -->
+        <section class="syl-panel-card lg:col-span-5 app-card rounded-3xl p-3.5 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <h2 class="syl-panel-title font-display text-sm sm:text-lg font-bold text-[#1E2D40] flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-[#EB7A5F] inline-block"></span>
+                2. Escolha a Vogal
+              </h2>
+              <span class="text-[11px] sm:text-xs font-extrabold text-[#8A96A3]">5 vogais</span>
+            </div>
+            <div id="vowel-grid" class="grid grid-cols-5 gap-2 sm:gap-3"></div>
+          </div>
+
+          <div class="vowel-tip-box mt-3.5 bg-[#FEF8E7] border border-[#F5DC93] rounded-2xl p-2.5 sm:p-3 text-xs sm:text-sm text-[#7A540C] font-bold">
+            💡 Toque em qualquer sílaba da família acima para comparar os sons!
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ========================================================= -->
+    <!-- MODO 2: MONTE A PALAVRA (4 LETRAS / 2 SÍLABAS SIMPLES)    -->
+    <!-- ========================================================= -->
+    <main id="view-words" class="hidden space-y-4">
+
+      <!-- Coluna Esquerda (no landscape): Barra de progresso + Imagem -->
+      <div class="words-left-col space-y-4">
+        <!-- Barra de Progresso das Palavras -->
+        <section class="word-progress-bar app-card rounded-3xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2">
+            <button id="btn-prev-word" type="button" class="word-nav-btn btn-3d w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-black text-base flex items-center justify-center cursor-pointer" title="Palavra anterior">◀</button>
+            <div>
+              <div class="text-[10px] sm:text-xs font-extrabold text-[#8A96A3] uppercase tracking-wide leading-none">Desafio do Richard</div>
+              <div id="word-progress-text" class="text-sm sm:text-base font-extrabold text-[#1E2D40] leading-tight">Palavra 1 de 18</div>
+            </div>
+            <button id="btn-next-word" type="button" class="word-nav-btn btn-3d w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-black text-base flex items-center justify-center cursor-pointer" title="Próxima palavra">▶</button>
+          </div>
+
+          <!-- Bolinhas de progresso -->
+          <div id="word-dots" class="word-dots-wrap hidden sm:flex flex-wrap items-center gap-1.5"></div>
+
+          <button id="btn-shuffle-words" type="button" class="btn-3d bg-[#E6F5F4] hover:bg-[#D5EEEC] border border-[#A8DCD9] text-[#1F726F] font-extrabold text-xs sm:text-sm px-3 py-1.5 sm:py-2 rounded-xl cursor-pointer">
+            🔀 Misturar
+          </button>
+
+          <!-- Barra linear fina para mobile -->
+          <div class="w-full sm:hidden h-2 bg-[#F4EFE4] rounded-full overflow-hidden">
+            <div id="word-progress-fill" class="h-full bg-gradient-to-r from-[#2E9A96] to-[#63B478] rounded-full transition-all duration-300" style="width: 5.5%"></div>
+          </div>
+        </section>
+
+        <!-- Ilustração Clicável -->
+        <section class="word-picture-card app-card rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center">
+          <button id="btn-picture-speak" type="button" class="group relative w-40 h-40 sm:w-56 sm:h-56 rounded-3xl bg-gradient-to-b from-[#FAF8F3] to-[#F4EFE4] border-4 border-[#EAE2D3] hover:border-[#38ADA9] shadow-inner flex items-center justify-center p-4 sm:p-5 cursor-pointer transition active:scale-95" title="Clique para ouvir a palavra">
+            <div id="word-svg-container" class="w-full h-full flex items-center justify-center float-soft"></div>
+            <span class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#2E9A96] group-hover:bg-[#227C78] text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5 whitespace-nowrap">
+              <span aria-hidden="true">🔊</span>
+              <span>Ouvir imagem</span>
+            </span>
+          </button>
+        </section>
+      </div>
+
+      <!-- Coluna Direita (no landscape): Caixinhas + Feedback + Teclado -->
+      <div class="words-right-col space-y-4">
+        <!-- Cartão de Montagem das 2 Sílabas -->
+        <section class="word-builder-card app-card rounded-3xl p-4 sm:p-6">
+          <div class="word-slots-row flex flex-wrap items-start justify-center sm:justify-between gap-2.5 sm:gap-4 w-full">
+            <!-- Grupo das 2 Sílabas -->
+            <div class="flex items-start justify-center gap-2 sm:gap-3.5">
+              <!-- Sílaba 1 -->
+              <div class="flex flex-col items-center bg-[#E6F5F4]/80 border border-[#A8DCD9] rounded-2xl p-2">
+                <div class="flex gap-1.5 sm:gap-2">
+                  <button id="slot-0" type="button" data-index="0" class="letter-slot font-display w-12 h-14 sm:w-16 sm:h-20 rounded-xl sm:rounded-2xl border-4 border-[#DDD5C4] bg-white text-2xl sm:text-4xl font-bold text-[#1E2D40] flex items-center justify-center cursor-pointer"></button>
+                  <button id="slot-1" type="button" data-index="1" class="letter-slot font-display w-12 h-14 sm:w-16 sm:h-20 rounded-xl sm:rounded-2xl border-4 border-[#DDD5C4] bg-white text-2xl sm:text-4xl font-bold text-[#1E2D40] flex items-center justify-center cursor-pointer"></button>
+                </div>
+                <button id="pill-syl-1" type="button" class="syl-pill-btn mt-1.5 text-[11px] sm:text-xs font-extrabold px-2.5 py-0.5 sm:py-1 rounded-full bg-white text-[#1F726F] border border-[#A8DCD9] hover:bg-[#D5EEEC] cursor-pointer transition">
+                  🔊 Sílaba 1
+                </button>
+              </div>
+
+              <div class="h-16 sm:h-24 flex items-center text-xl sm:text-2xl font-black text-[#C5BCB0] select-none">•</div>
+
+              <!-- Sílaba 2 -->
+              <div class="flex flex-col items-center bg-[#FDF0EC]/85 border border-[#F7C5B8] rounded-2xl p-2">
+                <div class="flex gap-1.5 sm:gap-2">
+                  <button id="slot-2" type="button" data-index="2" class="letter-slot font-display w-12 h-14 sm:w-16 sm:h-20 rounded-xl sm:rounded-2xl border-4 border-[#DDD5C4] bg-white text-2xl sm:text-4xl font-bold text-[#1E2D40] flex items-center justify-center cursor-pointer"></button>
+                  <button id="slot-3" type="button" data-index="3" class="letter-slot font-display w-12 h-14 sm:w-16 sm:h-20 rounded-xl sm:rounded-2xl border-4 border-[#DDD5C4] bg-white text-2xl sm:text-4xl font-bold text-[#1E2D40] flex items-center justify-center cursor-pointer"></button>
+                </div>
+                <button id="pill-syl-2" type="button" class="syl-pill-btn mt-1.5 text-[11px] sm:text-xs font-extrabold px-2.5 py-0.5 sm:py-1 rounded-full bg-white text-[#C2533A] border border-[#F7C5B8] hover:bg-[#FAE2DA] cursor-pointer transition">
+                  🔊 Sílaba 2
+                </button>
+              </div>
+            </div>
+
+            <!-- Botão Ouvir e Conferir -->
+            <div class="flex items-center self-center">
+              <button id="btn-check-word" type="button" class="btn-3d btn-teal h-14 sm:h-20 px-4 sm:px-5 rounded-2xl font-extrabold text-xs sm:text-base flex items-center gap-2 cursor-pointer">
+                <span class="text-lg sm:text-xl" aria-hidden="true">🔊</span>
+                <span class="text-left leading-tight">Ouvir e<br/>Conferir</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Área de Feedback -->
+          <div id="word-feedback" class="mt-3.5 min-h-[50px] w-full rounded-2xl px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2 bg-[#FAF8F3] border-2 border-[#EAE2D3]">
+            <span id="word-feedback-text" class="text-xs sm:text-base font-bold text-[#5A6B7C]">
+              Clique na imagem para ouvir a palavra e comece a montar!
+            </span>
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <button id="btn-hint" type="button" class="btn-3d bg-[#FEF8E7] hover:bg-[#F9ECC3] border border-[#F5DC93] text-[#7A540C] font-extrabold text-xs sm:text-sm px-3 py-1.5 rounded-xl cursor-pointer">
+                💡 Dica
+              </button>
+              <button id="btn-clear-word" type="button" class="btn-3d bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-extrabold text-xs sm:text-sm px-3 py-1.5 rounded-xl cursor-pointer">
+                ↺ Limpar
+              </button>
+              <button id="btn-go-next" type="button" class="hidden btn-3d btn-coral font-extrabold text-xs sm:text-sm px-3.5 py-1.5 sm:py-2 rounded-xl cursor-pointer">
+                Próxima ➔
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Teclado Virtual Amigável -->
+        <section class="word-kb-card app-card rounded-3xl p-3.5 sm:p-5">
+          <div class="word-kb-header flex items-center justify-between gap-2 mb-2.5">
+            <h2 class="font-display text-sm sm:text-base font-bold text-[#1E2D40]">
+              Teclado de Letras
+              <span class="kb-desktop-hint hidden sm:inline text-xs font-sans font-semibold text-[#8A96A3]">(ou digite no teclado físico)</span>
+            </h2>
+            <button id="btn-backspace" type="button" class="btn-3d bg-[#FDF0EC] hover:bg-[#FAE2DA] border border-[#F7C5B8] text-[#C2533A] font-extrabold text-xs sm:text-sm px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer">
+              <span>⌫</span>
+              <span>Apagar</span>
+            </button>
+          </div>
+
+          <!-- Linha das Vogais (Coral) -->
+          <div id="kb-vowels" class="grid grid-cols-5 gap-2 sm:gap-2.5 mb-2.5 max-w-md mx-auto"></div>
+
+          <!-- Linha das Consoantes (Teal) -->
+          <div id="kb-consonants" class="grid grid-cols-6 sm:grid-cols-11 gap-2 sm:gap-2"></div>
+        </section>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================
+      // 1. DADOS PEDAGÓGICOS (SÍLABAS SIMPLES CV + 18 PALAVRAS)
+      // =========================================================
+      const CONSONANTS = ['B', 'D', 'F', 'G', 'L', 'M', 'N', 'P', 'R', 'T', 'V'];
+      const VOWELS = ['A', 'E', 'I', 'O', 'U'];
+
+      const SYLLABLE_PHONETICS = {
+        BA: 'bá', BE: 'bê', BI: 'bi', BO: 'bô', BU: 'bu',
+        DA: 'dá', DE: 'dê', DI: 'di', DO: 'dô', DU: 'du',
+        FA: 'fá', FE: 'fê', FI: 'fi', FO: 'fô', FU: 'fu',
+        GA: 'gá', GE: 'gê', GI: 'gi', GO: 'gô', GU: 'gu',
+        LA: 'lá', LE: 'lê', LI: 'li', LO: 'lô', LU: 'lu',
+        MA: 'má', ME: 'mê', MI: 'mi', MO: 'mô', MU: 'mu',
+        NA: 'ná', NE: 'nê', NI: 'ni', NO: 'nô', NU: 'nu',
+        PA: 'pá', PE: 'pê', PI: 'pi', PO: 'pô', PU: 'pu',
+        RA: 'rá', RE: 'rê', RI: 'ri', RO: 'rô', RU: 'ru',
+        TA: 'tá', TE: 'tê', TI: 'ti', TO: 'tô', TU: 'tu',
+        VA: 'vá', VE: 'vê', VI: 'vi', VO: 'vô', VU: 'vu'
+      };
+
+      const LETTER_NAMES = {
+        A: 'á', E: 'é', I: 'i', O: 'ó', U: 'u',
+        B: 'bê', D: 'dê', F: 'éfe', G: 'gê', L: 'éle',
+        M: 'ême', N: 'êne', P: 'pê', R: 'érre', T: 'tê', V: 'vê'
+      };
+
+      const SVGS = {
+        BOLA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <defs>
+            <radialGradient id="ballGrad" cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="80%" stop-color="#e2e8f0"/>
+              <stop offset="100%" stop-color="#cbd5e1"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="60" cy="108" rx="34" ry="7" fill="#A8DCD9" opacity="0.55"/>
+          <circle cx="60" cy="58" r="44" fill="url(#ballGrad)" stroke="#1E2D40" stroke-width="3.5"/>
+          <polygon points="60,40 75,51 69,69 51,69 45,51" fill="#1E2D40"/>
+          <polygon points="60,14 71,24 60,30 49,24" fill="#1E2D40"/>
+          <polygon points="99,45 91,57 83,48 92,36" fill="#1E2D40"/>
+          <polygon points="21,45 29,57 37,48 28,36" fill="#1E2D40"/>
+          <polygon points="84,92 75,80 86,74 94,84" fill="#1E2D40"/>
+          <polygon points="36,92 45,80 34,74 26,84" fill="#1E2D40"/>
+          <path d="M60 30 L60 40 M75 51 L83 48 M45 51 L37 48 M69 69 L75 80 M51 69 L45 80" stroke="#1E2D40" stroke-width="2.5"/>
+        </svg>`,
+
+        BOLO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <ellipse cx="60" cy="104" rx="44" ry="8" fill="#DDD5C4"/>
+          <rect x="24" y="54" width="72" height="44" rx="10" fill="#fde68a" stroke="#b45309" stroke-width="3"/>
+          <rect x="24" y="72" width="72" height="10" fill="#f472b6"/>
+          <path d="M24 62 Q33 74 42 62 Q51 74 60 62 Q69 74 78 62 Q87 74 96 62 L96 54 Q96 48 88 48 L32 48 Q24 48 24 54 Z" fill="#EB7A5F"/>
+          <rect x="56" y="26" width="8" height="22" rx="3" fill="#38ADA9" stroke="#1F726F" stroke-width="2"/>
+          <path d="M60 11 C66 18 66 25 60 27 C54 25 54 18 60 11 Z" fill="#f59e0b"/>
+          <path d="M60 16 C63 20 63 24 60 25 C57 24 57 20 60 16 Z" fill="#fef08a"/>
+          <circle cx="38" cy="54" r="3" fill="#ffffff"/>
+          <circle cx="82" cy="54" r="3" fill="#ffffff"/>
+        </svg>`,
+
+        PATO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <ellipse cx="60" cy="102" rx="42" ry="9" fill="#38ADA9" opacity="0.35"/>
+          <path d="M26 72 C24 90 42 98 66 98 C90 98 100 84 96 68 C94 60 88 64 82 64 C74 64 72 54 62 54 C42 54 28 60 26 72 Z" fill="#F7CE65" stroke="#C6931E" stroke-width="3"/>
+          <circle cx="44" cy="44" r="20" fill="#F7CE65" stroke="#C6931E" stroke-width="3"/>
+          <path d="M16 44 C16 39 24 38 28 42 C24 49 16 49 16 44 Z" fill="#EB7A5F" stroke="#C2533A" stroke-width="2.5"/>
+          <circle cx="38" cy="39" r="3.5" fill="#1E2D40"/>
+          <circle cx="37" cy="38" r="1.2" fill="#ffffff"/>
+          <path d="M56 72 C66 70 76 74 78 82 C68 86 58 84 54 78 Z" fill="#FDE68A" stroke="#C6931E" stroke-width="2.5"/>
+        </svg>`,
+
+        PIPA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <path d="M60 82 Q75 94 64 104 Q54 112 72 116" fill="none" stroke="#5A6B7C" stroke-width="3" stroke-linecap="round"/>
+          <polygon points="64,95 72,92 70,101" fill="#EB7A5F"/>
+          <polygon points="56,105 64,102 62,111" fill="#F4C44E"/>
+          <polygon points="60,12 96,46 60,84 24,46" fill="#38ADA9" stroke="#1E2D40" stroke-width="3"/>
+          <polygon points="60,12 96,46 60,46" fill="#EB7A5F"/>
+          <polygon points="60,46 24,46 60,84" fill="#F7CE65"/>
+          <polygon points="60,46 96,46 60,84" fill="#63B478"/>
+          <line x1="60" y1="12" x2="60" y2="84" stroke="#1E2D40" stroke-width="2.5"/>
+          <line x1="24" y1="46" x2="96" y2="46" stroke="#1E2D40" stroke-width="2.5"/>
+        </svg>`,
+
+        DADO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <rect x="20" y="20" width="80" height="80" rx="18" fill="#ffffff" stroke="#1E2D40" stroke-width="4"/>
+          <rect x="26" y="26" width="68" height="68" rx="13" fill="#FAF8F3"/>
+          <circle cx="42" cy="42" r="7.5" fill="#EB7A5F"/>
+          <circle cx="78" cy="42" r="7.5" fill="#EB7A5F"/>
+          <circle cx="60" cy="60" r="7.5" fill="#EB7A5F"/>
+          <circle cx="42" cy="78" r="7.5" fill="#EB7A5F"/>
+          <circle cx="78" cy="78" r="7.5" fill="#EB7A5F"/>
+        </svg>`,
+
+        DEDO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <path d="M46 106 L46 36 C46 22 74 22 74 36 L74 106 Z" fill="#fdba74" stroke="#c2410c" stroke-width="3.5"/>
+          <path d="M51 35 C51 27 69 27 69 35 L69 47 C69 51 51 51 51 47 Z" fill="#fff1f2" stroke="#EB7A5F" stroke-width="2"/>
+          <line x1="52" y1="68" x2="68" y2="68" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="54" y1="74" x2="66" y2="74" stroke="#ea580c" stroke-width="2" stroke-linecap="round"/>
+          <path d="M36 92 C36 82 46 82 46 92 L46 106 L36 106 Z" fill="#fed7aa" stroke="#c2410c" stroke-width="3"/>
+          <path d="M74 92 C74 82 84 82 84 92 L84 106 L74 106 Z" fill="#fed7aa" stroke="#c2410c" stroke-width="3"/>
+        </svg>`,
+
+        TATU: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <ellipse cx="62" cy="98" rx="44" ry="8" fill="#DDD5C4"/>
+          <path d="M90 78 L110 86 L92 88 Z" fill="#a16207" stroke="#713f12" stroke-width="2.5"/>
+          <path d="M32 82 C32 46 88 46 92 82 Z" fill="#b45309" stroke="#78350f" stroke-width="3"/>
+          <path d="M48 53 C52 64 52 74 48 82" fill="none" stroke="#fde68a" stroke-width="3.5"/>
+          <path d="M62 50 C66 64 66 74 62 82" fill="none" stroke="#fde68a" stroke-width="3.5"/>
+          <path d="M76 53 C80 64 80 74 76 82" fill="none" stroke="#fde68a" stroke-width="3.5"/>
+          <path d="M12 78 C16 66 28 62 36 68 L36 82 L16 82 Z" fill="#d97706" stroke="#78350f" stroke-width="3"/>
+          <ellipse cx="32" cy="60" rx="5" ry="9" transform="rotate(-20 32 60)" fill="#d97706" stroke="#78350f" stroke-width="2.5"/>
+          <circle cx="24" cy="73" r="2.8" fill="#1E2D40"/>
+          <rect x="42" y="82" width="10" height="12" rx="4" fill="#92400e"/>
+          <rect x="72" y="82" width="10" height="12" rx="4" fill="#92400e"/>
+        </svg>`,
+
+        MALA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <path d="M44 36 L44 24 C44 19 76 19 76 24 L76 36" fill="none" stroke="#78350f" stroke-width="6" stroke-linecap="round"/>
+          <rect x="18" y="36" width="84" height="64" rx="14" fill="#EB7A5F" stroke="#C2533A" stroke-width="3.5"/>
+          <rect x="34" y="36" width="10" height="64" fill="#F7CE65"/>
+          <rect x="76" y="36" width="10" height="64" fill="#F7CE65"/>
+          <rect x="32" y="60" width="14" height="12" rx="3" fill="#78350f"/>
+          <rect x="74" y="60" width="14" height="12" rx="3" fill="#78350f"/>
+          <circle cx="60" cy="66" r="10" fill="#ffffff" opacity="0.95"/>
+          <text x="60" y="70" text-anchor="middle" font-size="11" font-weight="900" fill="#2E9A96">BR</text>
+        </svg>`,
+
+        MOTO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <circle cx="30" cy="84" r="18" fill="#334155" stroke="#1E2D40" stroke-width="4"/>
+          <circle cx="30" cy="84" r="7" fill="#cbd5e1"/>
+          <circle cx="90" cy="84" r="18" fill="#334155" stroke="#1E2D40" stroke-width="4"/>
+          <circle cx="90" cy="84" r="7" fill="#cbd5e1"/>
+          <path d="M30 84 L54 58 L80 58 L90 84" fill="none" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M46 56 C52 44 72 44 82 54 L76 66 L48 66 Z" fill="#EB7A5F" stroke="#C2533A" stroke-width="3"/>
+          <path d="M24 58 L48 58 L42 68 L26 68 Z" fill="#1E2D40"/>
+          <path d="M76 42 L88 42 L82 56" fill="none" stroke="#1E2D40" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="93" cy="54" r="6" fill="#F7CE65" stroke="#C6931E" stroke-width="2.5"/>
+        </svg>`,
+
+        MAPA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <polygon points="16,30 46,20 46,92 16,102" fill="#FEF8E7" stroke="#C6931E" stroke-width="3"/>
+          <polygon points="46,20 74,30 74,102 46,92" fill="#F7E7B8" stroke="#C6931E" stroke-width="3"/>
+          <polygon points="74,30 104,20 104,92 74,102" fill="#FEF8E7" stroke="#C6931E" stroke-width="3"/>
+          <path d="M26 78 Q44 58 60 66 T90 42" fill="none" stroke="#EB7A5F" stroke-width="3.5" stroke-dasharray="6 5" stroke-linecap="round"/>
+          <path d="M84 36 L96 48 M96 36 L84 48" stroke="#C2533A" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="28" cy="78" r="5" fill="#2E9A96"/>
+          <path d="M30 44 C35 38 42 42 40 50 C34 52 28 50 30 44 Z" fill="#63B478"/>
+        </svg>`,
+
+        LATA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <rect x="34" y="24" width="52" height="76" rx="8" fill="#38ADA9" stroke="#1F726F" stroke-width="3.5"/>
+          <ellipse cx="60" cy="24" rx="26" ry="9" fill="#e2e8f0" stroke="#64748b" stroke-width="3"/>
+          <ellipse cx="60" cy="24" rx="14" ry="4" fill="#94a3b8"/>
+          <rect x="34" y="46" width="52" height="28" fill="#F7CE65" stroke="#C6931E" stroke-width="2"/>
+          <circle cx="60" cy="60" r="8" fill="#EB7A5F"/>
+          <ellipse cx="60" cy="100" rx="26" ry="7" fill="#2A928E" stroke="#1F726F" stroke-width="3"/>
+        </svg>`,
+
+        LUVA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <path d="M34 64 L34 32 C34 26 42 26 42 32 L42 54 L46 24 C46 18 55 18 55 24 L55 52 L60 22 C60 16 69 16 69 22 L69 52 L74 28 C74 22 83 22 83 28 L83 62 L92 54 C98 50 104 56 98 63 L82 86 L82 100 L38 100 L38 84 Z" fill="#38ADA9" stroke="#1F726F" stroke-width="3.5" stroke-linejoin="round"/>
+          <rect x="36" y="88" width="48" height="14" rx="5" fill="#A8DCD9" stroke="#1F726F" stroke-width="3"/>
+        </svg>`,
+
+        FADA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <ellipse cx="36" cy="56" rx="20" ry="13" transform="rotate(-20 36 56)" fill="#E6F5F4" stroke="#38ADA9" stroke-width="2.5"/>
+          <ellipse cx="84" cy="56" rx="20" ry="13" transform="rotate(20 84 56)" fill="#E6F5F4" stroke="#38ADA9" stroke-width="2.5"/>
+          <path d="M44 96 L60 56 L76 96 Z" fill="#EB7A5F" stroke="#C2533A" stroke-width="3" stroke-linejoin="round"/>
+          <circle cx="60" cy="40" r="16" fill="#fed7aa" stroke="#ea580c" stroke-width="2.5"/>
+          <path d="M44 38 C46 22 74 22 76 38 C70 30 50 30 44 38 Z" fill="#F7CE65" stroke="#C6931E" stroke-width="2"/>
+          <circle cx="55" cy="40" r="2.2" fill="#1E2D40"/>
+          <circle cx="65" cy="40" r="2.2" fill="#1E2D40"/>
+          <path d="M56 46 Q60 50 64 46" fill="none" stroke="#C2533A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="78" y1="68" x2="98" y2="40" stroke="#92400e" stroke-width="3" stroke-linecap="round"/>
+          <polygon points="98,28 101,36 109,36 103,41 105,49 98,44 91,49 93,41 87,36 95,36" fill="#F7CE65" stroke="#C6931E" stroke-width="1.5"/>
+        </svg>`,
+
+        FOGO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <rect x="26" y="92" width="68" height="12" rx="6" transform="rotate(-10 60 98)" fill="#92400e" stroke="#451a03" stroke-width="2.5"/>
+          <rect x="26" y="92" width="68" height="12" rx="6" transform="rotate(10 60 98)" fill="#b45309" stroke="#451a03" stroke-width="2.5"/>
+          <path d="M60 14 C82 36 92 56 86 76 C82 90 70 96 60 96 C46 96 34 86 34 70 C34 52 46 38 60 14 Z" fill="#EB7A5F" stroke="#C2533A" stroke-width="3"/>
+          <path d="M60 36 C72 52 76 66 72 78 C69 86 64 90 60 90 C52 90 46 82 46 72 C46 58 53 48 60 36 Z" fill="#F7CE65"/>
+          <path d="M60 58 C66 68 68 76 64 83 C62 86 58 86 56 83 C52 76 54 68 60 58 Z" fill="#FEF8E7"/>
+        </svg>`,
+
+        VELA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <ellipse cx="60" cy="102" rx="34" ry="8" fill="#DDD5C4"/>
+          <rect x="42" y="46" width="36" height="54" rx="8" fill="#FEF8E7" stroke="#C6931E" stroke-width="3"/>
+          <path d="M42 54 Q51 64 58 54 Q66 68 78 54 L78 46 L42 46 Z" fill="#ffffff"/>
+          <line x1="60" y1="36" x2="60" y2="46" stroke="#1E2D40" stroke-width="3"/>
+          <path d="M60 12 C70 24 70 36 60 40 C50 36 50 24 60 12 Z" fill="#EB7A5F"/>
+          <path d="M60 20 C65 28 65 35 60 37 C55 35 55 28 60 20 Z" fill="#F7CE65"/>
+        </svg>`,
+
+        GATO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <polygon points="28,46 36,16 54,36" fill="#F18B72" stroke="#C2533A" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="92,46 84,16 66,36" fill="#F18B72" stroke="#C2533A" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="34,42 38,24 49,36" fill="#FAD4C8"/>
+          <polygon points="86,42 82,24 71,36" fill="#FAD4C8"/>
+          <ellipse cx="60" cy="64" rx="38" ry="34" fill="#F18B72" stroke="#C2533A" stroke-width="3.5"/>
+          <circle cx="46" cy="58" r="5" fill="#1E2D40"/>
+          <circle cx="74" cy="58" r="5" fill="#1E2D40"/>
+          <circle cx="44" cy="56" r="1.8" fill="#ffffff"/>
+          <circle cx="72" cy="56" r="1.8" fill="#ffffff"/>
+          <polygon points="55,67 65,67 60,73" fill="#C2533A"/>
+          <path d="M52 78 Q60 84 68 78" fill="none" stroke="#7c2d12" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16" y1="64" x2="36" y2="67" stroke="#7c2d12" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16" y1="74" x2="36" y2="73" stroke="#7c2d12" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="104" y1="64" x2="84" y2="67" stroke="#7c2d12" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="104" y1="74" x2="84" y2="73" stroke="#7c2d12" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>`,
+
+        RATO: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <circle cx="34" cy="34" r="18" fill="#94a3b8" stroke="#475569" stroke-width="3"/>
+          <circle cx="34" cy="34" r="10" fill="#F7C5B8"/>
+          <circle cx="86" cy="34" r="18" fill="#94a3b8" stroke="#475569" stroke-width="3"/>
+          <circle cx="86" cy="34" r="10" fill="#F7C5B8"/>
+          <path d="M26 60 C26 36 94 36 94 60 C94 82 72 96 60 96 C48 96 26 82 26 60 Z" fill="#cbd5e1" stroke="#475569" stroke-width="3.5"/>
+          <circle cx="47" cy="58" r="4.5" fill="#1E2D40"/>
+          <circle cx="73" cy="58" r="4.5" fill="#1E2D40"/>
+          <circle cx="60" cy="78" r="6" fill="#EB7A5F" stroke="#C2533A" stroke-width="2"/>
+          <line x1="18" y1="74" x2="40" y2="76" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="18" y1="84" x2="40" y2="82" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="102" y1="74" x2="80" y2="76" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="102" y1="84" x2="80" y2="82" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>`,
+
+        RODA: `<svg viewBox="0 0 120 120" class="w-full h-full">
+          <circle cx="60" cy="60" r="46" fill="#334155" stroke="#1E2D40" stroke-width="4"/>
+          <circle cx="60" cy="60" r="28" fill="#e2e8f0" stroke="#64748b" stroke-width="3"/>
+          <line x1="60" y1="32" x2="60" y2="88" stroke="#64748b" stroke-width="6"/>
+          <line x1="32" y1="60" x2="88" y2="60" stroke="#64748b" stroke-width="6"/>
+          <line x1="40" y1="40" x2="80" y2="80" stroke="#64748b" stroke-width="5"/>
+          <line x1="80" y1="40" x2="40" y2="80" stroke="#64748b" stroke-width="5"/>
+          <circle cx="60" cy="60" r="10" fill="#94a3b8" stroke="#334155" stroke-width="3"/>
+        </svg>`
+      };
+
+      const BASE_WORDS = [
+        { word: 'BOLA', syl: ['BO', 'LA'], sylPhon: ['bó', 'lá'], intro: 'Bola! Isso aqui é uma bola.', speakWord: 'bola' },
+        { word: 'BOLO', syl: ['BO', 'LO'], sylPhon: ['bô', 'lô'], intro: 'Bolo! Isso aqui é um bolo.', speakWord: 'bolo' },
+        { word: 'PATO', syl: ['PA', 'TO'], sylPhon: ['pá', 'tô'], intro: 'Pato! Isso aqui é um pato.', speakWord: 'pato' },
+        { word: 'PIPA', syl: ['PI', 'PA'], sylPhon: ['pi', 'pá'], intro: 'Pipa! Isso aqui é uma pipa.', speakWord: 'pipa' },
+        { word: 'DADO', syl: ['DA', 'DO'], sylPhon: ['dá', 'dô'], intro: 'Dado! Isso aqui é um dado.', speakWord: 'dado' },
+        { word: 'DEDO', syl: ['DE', 'DO'], sylPhon: ['dê', 'dô'], intro: 'Dedo! Isso aqui é um dedo.', speakWord: 'dedo' },
+        { word: 'TATU', syl: ['TA', 'TU'], sylPhon: ['tá', 'tu'], intro: 'Tatu! Isso aqui é um tatu.', speakWord: 'tatu' },
+        { word: 'MALA', syl: ['MA', 'LA'], sylPhon: ['má', 'lá'], intro: 'Mala! Isso aqui é uma mala.', speakWord: 'mala' },
+        { word: 'MOTO', syl: ['MO', 'TO'], sylPhon: ['mó', 'tô'], intro: 'Moto! Isso aqui é uma moto.', speakWord: 'moto' },
+        { word: 'MAPA', syl: ['MA', 'PA'], sylPhon: ['má', 'pá'], intro: 'Mapa! Isso aqui é um mapa.', speakWord: 'mapa' },
+        { word: 'LATA', syl: ['LA', 'TA'], sylPhon: ['lá', 'tá'], intro: 'Lata! Isso aqui é uma lata.', speakWord: 'lata' },
+        { word: 'LUVA', syl: ['LU', 'VA'], sylPhon: ['lu', 'vá'], intro: 'Luva! Isso aqui é uma luva.', speakWord: 'luva' },
+        { word: 'FADA', syl: ['FA', 'DA'], sylPhon: ['fá', 'dá'], intro: 'Fada! Isso aqui é uma fada.', speakWord: 'fada' },
+        { word: 'FOGO', syl: ['FO', 'GO'], sylPhon: ['fô', 'gô'], intro: 'Fogo! Isso aqui é fogo.', speakWord: 'fogo' },
+        { word: 'VELA', syl: ['VE', 'LA'], sylPhon: ['vé', 'lá'], intro: 'Vela! Isso aqui é uma vela.', speakWord: 'vela' },
+        { word: 'GATO', syl: ['GA', 'TO'], sylPhon: ['gá', 'tô'], intro: 'Gato! Isso aqui é um gato.', speakWord: 'gato' },
+        { word: 'RATO', syl: ['RA', 'TO'], sylPhon: ['rá', 'tô'], intro: 'Rato! Isso aqui é um rato.', speakWord: 'rato' },
+        { word: 'RODA', syl: ['RO', 'DA'], sylPhon: ['ró', 'dá'], intro: 'Roda! Isso aqui é uma roda.', speakWord: 'roda' }
+      ];
+
+      // =========================================================
+      // 2. ESTADO DA APLICAÇÃO
+      // =========================================================
+      const state = {
+        mode: 'syllables',
+        selectedConsonant: 'B',
+        selectedVowel: 'A',
+        stars: 0,
+        slowMode: false,
+        sfxEnabled: true,
+        ptVoices: [],
+        selectedVoiceURI: '',
+        familyPlaying: false,
+        familyTimers: [],
+
+        words: BASE_WORDS.slice(),
+        wordIndex: 0,
+        slots: ['', '', '', ''],
+        activeSlot: 0,
+        solvedWords: {},
+        hintLevel: 0,
+        wordJustSolved: false,
+        slotStatus: [null, null, null, null]
+      };
+
+      try {
+        const savedStars = parseInt(localStorage.getItem('richard_silabas_stars') || '0', 10);
+        if (!Number.isNaN(savedStars) && savedStars >= 0) state.stars = savedStars;
+
+        const savedSlow = localStorage.getItem('richard_silabas_slow');
+        if (savedSlow !== null) state.slowMode = savedSlow === 'true';
+
+        const savedVoice = localStorage.getItem('richard_silabas_voice');
+        if (savedVoice) state.selectedVoiceURI = savedVoice;
+      } catch (e) { /* ignora */ }
+
+      function savePreferences() {
+        try {
+          localStorage.setItem('richard_silabas_slow', String(state.slowMode));
+          if (state.selectedVoiceURI) {
+            localStorage.setItem('richard_silabas_voice', state.selectedVoiceURI);
+          }
+        } catch (e) { /* ignora */ }
+      }
+
+      function addStar(amount) {
+        state.stars += amount;
+        document.getElementById('star-count').textContent = String(state.stars);
+        const badge = document.getElementById('star-badge');
+        badge.classList.remove('animate-pop');
+        void badge.offsetWidth;
+        badge.classList.add('animate-pop');
+        try {
+          localStorage.setItem('richard_silabas_stars', String(state.stars));
+        } catch (e) { /* ignora */ }
+      }
+
+      // =========================================================
+      // 3. EFEITOS SONOROS (WEB AUDIO API)
+      // =========================================================
+      let audioCtx = null;
+
+      function ensureAudioCtx() {
+        if (!state.sfxEnabled) return null;
+        if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new Ctx();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function () {});
+        }
+        return audioCtx;
+      }
+
+      function playTone(freq, duration, type, volume, delay) {
+        const ctx = ensureAudioCtx();
+        if (!ctx) return;
+        const start = ctx.currentTime + (delay || 0);
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.001, start);
+        gain.gain.exponentialRampToValueAtTime(volume || 0.14, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + duration + 0.02);
+      }
+
+      function sfxPop() { playTone(520, 0.08, 'sine', 0.12, 0); }
+      function sfxJoin() {
+        playTone(440, 0.1, 'triangle', 0.12, 0);
+        playTone(660, 0.14, 'triangle', 0.12, 0.07);
+      }
+      function sfxSuccess() {
+        playTone(523.25, 0.12, 'triangle', 0.16, 0);
+        playTone(659.25, 0.12, 'triangle', 0.16, 0.1);
+        playTone(783.99, 0.15, 'triangle', 0.16, 0.2);
+        playTone(1046.5, 0.32, 'triangle', 0.18, 0.32);
+      }
+      function sfxRetry() {
+        playTone(300, 0.14, 'sine', 0.12, 0);
+        playTone(240, 0.2, 'sine', 0.12, 0.12);
+      }
+
+      // =========================================================
+      // 4. SÍNTESE DE VOZ (WEB SPEECH API PT-BR)
+      //    Padrão garantido: "português do Brasil"
+      // =========================================================
+      const hasSpeech = typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+      let currentUtterance = null;
+      let speakTimeout = null;
+
+      function cleanVoiceDisplayName(name) {
+        return String(name || '').replace(/^(Microsoft|Google)\s+/i, '').trim();
+      }
+
+      function pickDefaultPtBrVoice(voices) {
+        // 1º: exatamente "português do Brasil" (ex.: "Google português do Brasil" ou "português do Brasil")
+        const exactClean = voices.find(function (v) {
+          return /^portugu[eê]s do brasil$/i.test(cleanVoiceDisplayName(v.name));
+        });
+        if (exactClean) return exactClean;
+
+        // 2º: contém "português do Brasil" no nome
+        const containsPtBr = voices.find(function (v) {
+          return /portugu[eê]s do brasil/i.test(v.name);
+        });
+        if (containsPtBr) return containsPtBr;
+
+        // 3º: outras vozes naturais pt-BR
+        const natural = voices.find(function (v) {
+          return /google|francisca|maria|luciana|thalita|antonio|natural/i.test(v.name);
+        });
+        return natural || voices[0] || null;
+      }
+
+      function loadVoices() {
+        if (!hasSpeech) {
+          document.getElementById('speech-warning').classList.remove('hidden');
+          return;
+        }
+        const all = window.speechSynthesis.getVoices() || [];
+        const ptBR = all.filter(function (v) { return /^pt[-_]BR/i.test(v.lang); });
+        const ptAny = all.filter(function (v) { return /^pt/i.test(v.lang); });
+        state.ptVoices = ptBR.length ? ptBR : ptAny;
+
+        const wrap = document.getElementById('voice-selector-wrap');
+        const select = document.getElementById('voice-select');
+
+        if (state.ptVoices.length > 0) {
+          const preferred = pickDefaultPtBrVoice(state.ptVoices);
+          const hasSavedMatch = state.selectedVoiceURI && state.ptVoices.some(function (v) {
+            return v.voiceURI === state.selectedVoiceURI;
+          });
+
+          if (!hasSavedMatch && preferred) {
+            state.selectedVoiceURI = preferred.voiceURI;
+            savePreferences();
+          }
+
+          select.innerHTML = '';
+          state.ptVoices.forEach(function (v) {
+            const opt = document.createElement('option');
+            opt.value = v.voiceURI;
+            opt.textContent = cleanVoiceDisplayName(v.name) || v.name;
+            if (v.voiceURI === state.selectedVoiceURI) opt.selected = true;
+            select.appendChild(opt);
+          });
+
+          if (state.ptVoices.length > 1) {
+            wrap.classList.remove('hidden');
+            wrap.classList.add('flex');
+          }
+        }
+      }
+
+      if (hasSpeech) {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      } else {
+        document.getElementById('speech-warning').classList.remove('hidden');
+      }
+
+      function getSelectedVoice() {
+        if (!state.ptVoices.length) return null;
+        return state.ptVoices.find(function (v) { return v.voiceURI === state.selectedVoiceURI; }) || pickDefaultPtBrVoice(state.ptVoices);
+      }
+
+      function speakText(text, options) {
+        if (!hasSpeech || !text) return;
+        const opts = options || {};
+        clearTimeout(speakTimeout);
+        try {
+          window.speechSynthesis.cancel();
+        } catch (e) { /* ignora */ }
+
+        speakTimeout = setTimeout(function () {
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = 'pt-BR';
+          utter.rate = typeof opts.rate === 'number' ? opts.rate : (state.slowMode ? 0.80 : 0.94);
+          utter.pitch = typeof opts.pitch === 'number' ? opts.pitch : 1.05;
+          const voice = getSelectedVoice();
+          if (voice) utter.voice = voice;
+
+          if (opts.pulseEl) {
+            opts.pulseEl.classList.add('speaking-pulse');
+            const cleanup = function () { opts.pulseEl.classList.remove('speaking-pulse'); };
+            utter.onend = function () {
+              cleanup();
+              if (opts.onend) opts.onend();
+            };
+            utter.onerror = cleanup;
+          } else if (opts.onend) {
+            utter.onend = opts.onend;
+          }
+
+          currentUtterance = utter;
+          window.speechSynthesis.speak(utter);
+        }, 35);
+      }
+
+      function getPhoneticForPair(c1, c2, targetWordObj, sylIdx) {
+        const pair = (c1 + c2).toUpperCase();
+        if (targetWordObj && targetWordObj.syl[sylIdx] === pair) {
+          return targetWordObj.sylPhon[sylIdx];
+        }
+        if (SYLLABLE_PHONETICS[pair]) {
+          return SYLLABLE_PHONETICS[pair];
+        }
+        const n1 = LETTER_NAMES[c1] || c1.toLowerCase();
+        const n2 = LETTER_NAMES[c2] || c2.toLowerCase();
+        return n1 + ', ' + n2;
+      }
+
+      // =========================================================
+      // 5. MODO 1: FÁBRICA DE SÍLABAS
+      // =========================================================
+      function stopFamilyPlayback() {
+        state.familyPlaying = false;
+        state.familyTimers.forEach(function (t) { clearTimeout(t); });
+        state.familyTimers = [];
+      }
+
+      function getCurrentSyllable() {
+        return state.selectedConsonant + state.selectedVowel;
+      }
+
+      function speakCurrentSyllable() {
+        const syl = getCurrentSyllable();
+        const phon = SYLLABLE_PHONETICS[syl] || syl.toLowerCase();
+        const resultEl = document.getElementById('stage-result');
+        speakText(phon, { pulseEl: resultEl });
+      }
+
+      function renderSyllablesMode(shouldAnimate) {
+        const c = state.selectedConsonant;
+        const v = state.selectedVowel;
+        const syl = c + v;
+
+        document.getElementById('stage-consonant').textContent = c;
+        document.getElementById('stage-vowel').textContent = v;
+        const resultEl = document.getElementById('stage-result');
+        resultEl.textContent = syl;
+        document.getElementById('family-letter').textContent = c;
+        document.getElementById('spell-btn-label').textContent = 'Juntar devagar (' + c + ' + ' + v + ' = ' + syl + ')';
+
+        if (shouldAnimate) {
+          resultEl.classList.remove('animate-pop');
+          void resultEl.offsetWidth;
+          resultEl.classList.add('animate-pop');
+        }
+
+        document.querySelectorAll('#consonant-grid button').forEach(function (btn) {
+          btn.classList.toggle('selected', btn.dataset.letter === c);
+        });
+
+        document.querySelectorAll('#vowel-grid button').forEach(function (btn) {
+          btn.classList.toggle('selected', btn.dataset.letter === v);
+        });
+
+        const strip = document.getElementById('family-strip');
+        strip.innerHTML = '';
+        VOWELS.forEach(function (vowel) {
+          const pair = c + vowel;
+          const isCurrent = vowel === v;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.vowel = vowel;
+          btn.className = 'btn-3d font-display py-2.5 sm:py-3.5 rounded-2xl text-xl sm:text-3xl font-bold cursor-pointer border-2 transition ' +
+            (isCurrent
+              ? 'bg-[#F7CE65] text-[#4A3407] border-[#FFF3C4] shadow-md scale-[1.04]'
+              : 'bg-white/15 hover:bg-white/25 text-white border-white/25');
+          btn.textContent = pair;
+          btn.addEventListener('click', function () {
+            stopFamilyPlayback();
+            state.selectedVowel = vowel;
+            sfxJoin();
+            renderSyllablesMode(true);
+            speakCurrentSyllable();
+          });
+          strip.appendChild(btn);
+        });
+      }
+
+      function initSyllablesGrids() {
+        const cGrid = document.getElementById('consonant-grid');
+        cGrid.innerHTML = '';
+        CONSONANTS.forEach(function (letter) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.letter = letter;
+          btn.className = 'btn-3d tile-consonant font-display text-xl sm:text-3xl font-bold py-2.5 sm:py-3.5 rounded-2xl cursor-pointer';
+          btn.textContent = letter;
+          btn.addEventListener('click', function () {
+            stopFamilyPlayback();
+            state.selectedConsonant = letter;
+            sfxJoin();
+            renderSyllablesMode(true);
+            speakCurrentSyllable();
+          });
+          cGrid.appendChild(btn);
+        });
+
+        const vGrid = document.getElementById('vowel-grid');
+        vGrid.innerHTML = '';
+        VOWELS.forEach(function (letter) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.letter = letter;
+          btn.className = 'btn-3d tile-vowel font-display text-xl sm:text-3xl font-bold py-2.5 sm:py-3.5 rounded-2xl cursor-pointer';
+          btn.textContent = letter;
+          btn.addEventListener('click', function () {
+            stopFamilyPlayback();
+            state.selectedVowel = letter;
+            sfxJoin();
+            renderSyllablesMode(true);
+            speakCurrentSyllable();
+          });
+          vGrid.appendChild(btn);
+        });
+      }
+
+      // =========================================================
+      // 6. MODO 2: MONTE A PALAVRA
+      // =========================================================
+      function getCurrentWord() {
+        return state.words[state.wordIndex];
+      }
+
+      function resetCurrentWordState() {
+        state.slots = ['', '', '', ''];
+        state.activeSlot = 0;
+        state.hintLevel = 0;
+        state.wordJustSolved = false;
+        state.slotStatus = [null, null, null, null];
+      }
+
+      function renderWordMode() {
+        const w = getCurrentWord();
+        document.getElementById('word-progress-text').textContent =
+          'Palavra ' + (state.wordIndex + 1) + ' de ' + state.words.length;
+
+        const fillEl = document.getElementById('word-progress-fill');
+        if (fillEl) {
+          const pct = Math.round(((state.wordIndex + 1) / state.words.length) * 100);
+          fillEl.style.width = pct + '%';
+        }
+
+        document.getElementById('word-svg-container').innerHTML = SVGS[w.word] || '';
+
+        const dots = document.getElementById('word-dots');
+        dots.innerHTML = '';
+        state.words.forEach(function (item, idx) {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.title = 'Ir para palavra ' + (idx + 1);
+          const solved = Boolean(state.solvedWords[item.word]);
+          const isCurrent = idx === state.wordIndex;
+          dot.className = 'w-3.5 h-3.5 rounded-full transition cursor-pointer ' +
+            (isCurrent
+              ? 'bg-[#2E9A96] ring-4 ring-[#A8DCD9] scale-110'
+              : solved
+                ? 'bg-[#63B478] hover:bg-[#49965E]'
+                : 'bg-[#E5DEC9] hover:bg-[#D5CCB4]');
+          dot.addEventListener('click', function () {
+            sfxPop();
+            state.wordIndex = idx;
+            resetCurrentWordState();
+            renderWordMode();
+            speakText(getCurrentWord().intro, { pulseEl: document.getElementById('btn-picture-speak') });
+          });
+          dots.appendChild(dot);
+        });
+
+        for (let i = 0; i < 4; i++) {
+          const el = document.getElementById('slot-' + i);
+          el.textContent = state.slots[i];
+          el.classList.remove('active-slot', 'filled-slot', 'slot-correct', 'slot-wrong', 'animate-shake');
+          if (state.slotStatus[i] === 'correct') {
+            el.classList.add('slot-correct');
+          } else if (state.slotStatus[i] === 'wrong') {
+            el.classList.add('slot-wrong');
+          } else {
+            if (state.slots[i]) el.classList.add('filled-slot');
+            if (i === state.activeSlot && !state.wordJustSolved) {
+              el.classList.add('active-slot');
+            }
+          }
+        }
+
+        const s1 = state.slots[0] + state.slots[1];
+        const s2 = state.slots[2] + state.slots[3];
+        document.getElementById('pill-syl-1').textContent = s1.length === 2 ? ('🔊 ' + s1) : '🔊 Sílaba 1';
+        document.getElementById('pill-syl-2').textContent = s2.length === 2 ? ('🔊 ' + s2) : '🔊 Sílaba 2';
+
+        const nextBtn = document.getElementById('btn-go-next');
+        if (state.wordJustSolved) {
+          nextBtn.classList.remove('hidden');
+        } else {
+          nextBtn.classList.add('hidden');
+        }
+      }
+
+      function setFeedback(text, tone) {
+        const box = document.getElementById('word-feedback');
+        const label = document.getElementById('word-feedback-text');
+        label.textContent = text;
+        box.classList.remove(
+          'bg-[#FAF8F3]', 'border-[#EAE2D3]',
+          'bg-[#EDF8F0]', 'border-[#B3E0BF]',
+          'bg-[#FDF0EC]', 'border-[#F7C5B8]',
+          'bg-[#FEF8E7]', 'border-[#F5DC93]'
+        );
+        label.classList.remove('text-[#5A6B7C]', 'text-[#2E6E40]', 'text-[#B43E24]', 'text-[#7A540C]');
+
+        if (tone === 'success') {
+          box.classList.add('bg-[#EDF8F0]', 'border-[#B3E0BF]');
+          label.classList.add('text-[#2E6E40]');
+        } else if (tone === 'error') {
+          box.classList.add('bg-[#FDF0EC]', 'border-[#F7C5B8]');
+          label.classList.add('text-[#B43E24]');
+        } else if (tone === 'hint') {
+          box.classList.add('bg-[#FEF8E7]', 'border-[#F5DC93]');
+          label.classList.add('text-[#7A540C]');
+        } else {
+          box.classList.add('bg-[#FAF8F3]', 'border-[#EAE2D3]');
+          label.classList.add('text-[#5A6B7C]');
+        }
+      }
+
+      function inputLetter(letter) {
+        if (state.wordJustSolved) return;
+        const clean = letter.toUpperCase();
+        if (!/^[A-Z]$/.test(clean)) return;
+
+        const idx = state.activeSlot;
+        state.slots[idx] = clean;
+        state.slotStatus[idx] = null;
+        sfxPop();
+
+        const w = getCurrentWord();
+        const completedSyl1 = (idx === 0 || idx === 1) && state.slots[0] && state.slots[1];
+        const completedSyl2 = (idx === 2 || idx === 3) && state.slots[2] && state.slots[3];
+
+        let nextIdx = idx + 1;
+        if (nextIdx > 3) {
+          const firstEmpty = state.slots.findIndex(function (ch) { return !ch; });
+          nextIdx = firstEmpty !== -1 ? firstEmpty : 3;
+        }
+        state.activeSlot = nextIdx;
+        renderWordMode();
+
+        if (completedSyl1) {
+          const phon1 = getPhoneticForPair(state.slots[0], state.slots[1], w, 0);
+          setFeedback('Sílaba 1: ' + state.slots[0] + state.slots[1] + '! Agora complete a segunda sílaba.', 'default');
+          speakText(phon1, { pulseEl: document.getElementById('pill-syl-1') });
+        } else if (completedSyl2) {
+          const phon2 = getPhoneticForPair(state.slots[2], state.slots[3], w, 1);
+          setFeedback('Sílaba 2: ' + state.slots[2] + state.slots[3] + '! Aperte "Ouvir e Conferir".', 'default');
+          speakText(phon2, { pulseEl: document.getElementById('pill-syl-2') });
+        } else {
+          const letterSound = LETTER_NAMES[clean] || clean.toLowerCase();
+          speakText(letterSound);
+        }
+      }
+
+      function handleBackspace() {
+        if (state.wordJustSolved) return;
+        sfxPop();
+        if (state.slots[state.activeSlot]) {
+          state.slots[state.activeSlot] = '';
+          state.slotStatus[state.activeSlot] = null;
+        } else if (state.activeSlot > 0) {
+          state.activeSlot -= 1;
+          state.slots[state.activeSlot] = '';
+          state.slotStatus[state.activeSlot] = null;
+        }
+        renderWordMode();
+      }
+
+      function checkCurrentWord() {
+        const w = getCurrentWord();
+        const attempt = state.slots.join('');
+
+        if (attempt.length < 4) {
+          sfxRetry();
+          setFeedback('Faltam letras! Preencha as 4 caixinhas para conferir.', 'hint');
+          speakText('Faltam letras, Richard. Preencha as quatro caixinhas.');
+          return;
+        }
+
+        if (attempt === w.word) {
+          state.slotStatus = ['correct', 'correct', 'correct', 'correct'];
+          state.wordJustSolved = true;
+          const isNewSolve = !state.solvedWords[w.word];
+          state.solvedWords[w.word] = true;
+          if (isNewSolve) addStar(1);
+
+          sfxSuccess();
+          renderWordMode();
+          setFeedback('Parabéns, Richard! Você montou "' + w.word + '" certinho! ⭐', 'success');
+          speakText(w.speakWord + '! Muito bem, Richard! Você acertou!', {
+            pulseEl: document.getElementById('btn-check-word')
+          });
+
+          if (typeof window.confetti === 'function') {
+            window.confetti({
+              particleCount: 75,
+              spread: 68,
+              origin: { y: 0.65 },
+              colors: ['#2E9A96', '#EB7A5F', '#F7CE65', '#63B478']
+            });
+          }
+        } else {
+          let firstWrong = -1;
+          for (let i = 0; i < 4; i++) {
+            if (state.slots[i] === w.word[i]) {
+              state.slotStatus[i] = 'correct';
+            } else {
+              state.slotStatus[i] = 'wrong';
+              if (firstWrong === -1) firstWrong = i;
+            }
+          }
+          if (firstWrong !== -1) state.activeSlot = firstWrong;
+          sfxRetry();
+          renderWordMode();
+
+          for (let j = 0; j < 4; j++) {
+            if (state.slotStatus[j] === 'wrong') {
+              const slotEl = document.getElementById('slot-' + j);
+              slotEl.classList.add('animate-shake');
+            }
+          }
+
+          setFeedback('Quase lá, Richard! Veja as letras em coral e tente de novo.', 'error');
+          speakText('Quase lá, Richard! Vamos ouvir de novo: ' + w.speakWord + '.');
+        }
+      }
+
+      function initWordKeyboard() {
+        const kbV = document.getElementById('kb-vowels');
+        kbV.innerHTML = '';
+        VOWELS.forEach(function (letter) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-3d tile-vowel font-display text-xl sm:text-2xl font-bold py-2.5 sm:py-3 rounded-xl sm:rounded-2xl cursor-pointer';
+          btn.textContent = letter;
+          btn.addEventListener('click', function () { inputLetter(letter); });
+          kbV.appendChild(btn);
+        });
+
+        const kbC = document.getElementById('kb-consonants');
+        kbC.innerHTML = '';
+        CONSONANTS.forEach(function (letter) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-3d tile-consonant font-display text-xl sm:text-2xl font-bold py-2.5 sm:py-3 rounded-xl sm:rounded-2xl cursor-pointer';
+          btn.textContent = letter;
+          btn.addEventListener('click', function () { inputLetter(letter); });
+          kbC.appendChild(btn);
+        });
+      }
+
+      // =========================================================
+      // 7. TROCA DE MODOS E EVENTOS GLOBAIS
+      // =========================================================
+      function switchMode(newMode) {
+        stopFamilyPlayback();
+        state.mode = newMode;
+        const tabSyl = document.getElementById('tab-syllables');
+        const tabWrd = document.getElementById('tab-words');
+        const viewSyl = document.getElementById('view-syllables');
+        const viewWrd = document.getElementById('view-words');
+
+        const activeTabCls = 'mode-tab-btn btn-3d flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 rounded-xl font-extrabold text-xs sm:text-base cursor-pointer bg-[#2E9A96] text-white shadow-sm';
+        const idleTabCls = 'mode-tab-btn btn-3d flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 rounded-xl font-extrabold text-xs sm:text-base cursor-pointer text-[#5A6B7C] hover:text-[#1E2D40]';
+
+        if (newMode === 'syllables') {
+          viewSyl.classList.remove('hidden');
+          viewWrd.classList.add('hidden');
+          tabSyl.className = activeTabCls;
+          tabWrd.className = idleTabCls;
+          renderSyllablesMode(false);
+        } else {
+          viewWrd.classList.remove('hidden');
+          viewSyl.classList.add('hidden');
+          tabWrd.className = activeTabCls;
+          tabSyl.className = idleTabCls;
+          renderWordMode();
+          setFeedback('Clique na imagem para ouvir a palavra e comece a montar!', 'default');
+          speakText(getCurrentWord().intro, { pulseEl: document.getElementById('btn-picture-speak') });
+        }
+      }
+
+      function bindEvents() {
+        document.getElementById('star-count').textContent = String(state.stars);
+        document.getElementById('speed-label').textContent = state.slowMode ? 'Devagar' : 'Normal';
+        document.getElementById('speed-icon').textContent = state.slowMode ? '🐢' : '🐇';
+
+        document.getElementById('tab-syllables').addEventListener('click', function () {
+          sfxPop();
+          switchMode('syllables');
+        });
+        document.getElementById('tab-words').addEventListener('click', function () {
+          sfxPop();
+          switchMode('words');
+        });
+
+        document.getElementById('btn-speed').addEventListener('click', function () {
+          state.slowMode = !state.slowMode;
+          savePreferences();
+          sfxPop();
+          document.getElementById('speed-label').textContent = state.slowMode ? 'Devagar' : 'Normal';
+          document.getElementById('speed-icon').textContent = state.slowMode ? '🐢' : '🐇';
+          speakText(state.slowMode ? 'Voz devagar' : 'Voz normal');
+        });
+
+        document.getElementById('btn-sfx').addEventListener('click', function () {
+          state.sfxEnabled = !state.sfxEnabled;
+          document.getElementById('sfx-icon').textContent = state.sfxEnabled ? '🔊' : '🔇';
+          if (state.sfxEnabled) sfxPop();
+        });
+
+        document.getElementById('voice-select').addEventListener('change', function (e) {
+          state.selectedVoiceURI = e.target.value;
+          savePreferences();
+          speakText('Oi Richard! Vamos aprender as sílabas!');
+        });
+
+        document.getElementById('stage-consonant').addEventListener('click', function () {
+          sfxPop();
+          speakText(LETTER_NAMES[state.selectedConsonant] || state.selectedConsonant.toLowerCase(), {
+            pulseEl: document.getElementById('stage-consonant')
+          });
+        });
+
+        document.getElementById('stage-vowel').addEventListener('click', function () {
+          sfxPop();
+          speakText(LETTER_NAMES[state.selectedVowel] || state.selectedVowel.toLowerCase(), {
+            pulseEl: document.getElementById('stage-vowel')
+          });
+        });
+
+        document.getElementById('stage-result').addEventListener('click', function () {
+          sfxJoin();
+          speakCurrentSyllable();
+        });
+
+        document.getElementById('btn-speak-syllable').addEventListener('click', function () {
+          sfxJoin();
+          speakCurrentSyllable();
+        });
+
+        document.getElementById('btn-spell-syllable').addEventListener('click', function () {
+          stopFamilyPlayback();
+          const c = state.selectedConsonant;
+          const v = state.selectedVowel;
+          const syl = c + v;
+          const cSound = LETTER_NAMES[c] || c.toLowerCase();
+          const vSound = LETTER_NAMES[v] || v.toLowerCase();
+          const sylSound = SYLLABLE_PHONETICS[syl] || syl.toLowerCase();
+          speakText(cSound + ', com ' + vSound + ', faz ' + sylSound + '!', {
+            pulseEl: document.getElementById('stage-result')
+          });
+        });
+
+        document.getElementById('btn-play-family').addEventListener('click', function () {
+          stopFamilyPlayback();
+          state.familyPlaying = true;
+          VOWELS.forEach(function (vowel, idx) {
+            const timer = setTimeout(function () {
+              if (!state.familyPlaying) return;
+              state.selectedVowel = vowel;
+              renderSyllablesMode(true);
+              speakCurrentSyllable();
+              if (idx === VOWELS.length - 1) {
+                state.familyPlaying = false;
+              }
+            }, idx * 1050);
+            state.familyTimers.push(timer);
+          });
+        });
+
+        document.getElementById('btn-picture-speak').addEventListener('click', function () {
+          sfxPop();
+          speakText(getCurrentWord().intro, { pulseEl: document.getElementById('btn-picture-speak') });
+        });
+
+        for (let i = 0; i < 4; i++) {
+          (function (slotIndex) {
+            document.getElementById('slot-' + slotIndex).addEventListener('click', function () {
+              if (state.wordJustSolved) return;
+              sfxPop();
+              state.activeSlot = slotIndex;
+              renderWordMode();
+            });
+          })(i);
+        }
+
+        document.getElementById('pill-syl-1').addEventListener('click', function () {
+          if (state.slots[0] && state.slots[1]) {
+            const phon = getPhoneticForPair(state.slots[0], state.slots[1], getCurrentWord(), 0);
+            speakText(phon, { pulseEl: document.getElementById('pill-syl-1') });
+          } else {
+            speakText('Preencha as duas primeiras letras.');
+          }
+        });
+
+        document.getElementById('pill-syl-2').addEventListener('click', function () {
+          if (state.slots[2] && state.slots[3]) {
+            const phon = getPhoneticForPair(state.slots[2], state.slots[3], getCurrentWord(), 1);
+            speakText(phon, { pulseEl: document.getElementById('pill-syl-2') });
+          } else {
+            speakText('Preencha as duas últimas letras.');
+          }
+        });
+
+        document.getElementById('btn-check-word').addEventListener('click', checkCurrentWord);
+        document.getElementById('btn-backspace').addEventListener('click', handleBackspace);
+
+        document.getElementById('btn-clear-word').addEventListener('click', function () {
+          sfxPop();
+          resetCurrentWordState();
+          renderWordMode();
+          setFeedback('Caixinhas limpas! Tente montar a palavra novamente.', 'default');
+        });
+
+        document.getElementById('btn-hint').addEventListener('click', function () {
+          const w = getCurrentWord();
+          sfxPop();
+          if (state.hintLevel === 0) {
+            state.hintLevel = 1;
+            setFeedback('Dica: ouça bem as duas sílabas separadas!', 'hint');
+            speakText(w.sylPhon[0] + '... ' + w.sylPhon[1] + '. ' + w.speakWord + '.');
+          } else {
+            for (let i = 0; i < 4; i++) {
+              if (state.slots[i] !== w.word[i]) {
+                state.slots[i] = w.word[i];
+                state.slotStatus[i] = null;
+                state.activeSlot = Math.min(3, i + 1);
+                renderWordMode();
+                setFeedback('Dica: a letra ' + (i + 1) + ' é "' + w.word[i] + '"!', 'hint');
+                speakText('A letra ' + (i + 1) + ' é ' + (LETTER_NAMES[w.word[i]] || w.word[i].toLowerCase()) + '.');
+                break;
+              }
+            }
+          }
+        });
+
+        function goToWord(delta) {
+          sfxPop();
+          state.wordIndex = (state.wordIndex + delta + state.words.length) % state.words.length;
+          resetCurrentWordState();
+          renderWordMode();
+          setFeedback('Clique na imagem para ouvir a palavra e comece a montar!', 'default');
+          speakText(getCurrentWord().intro, { pulseEl: document.getElementById('btn-picture-speak') });
+        }
+
+        document.getElementById('btn-prev-word').addEventListener('click', function () { goToWord(-1); });
+        document.getElementById('btn-next-word').addEventListener('click', function () { goToWord(1); });
+        document.getElementById('btn-go-next').addEventListener('click', function () { goToWord(1); });
+
+        document.getElementById('btn-shuffle-words').addEventListener('click', function () {
+          sfxPop();
+          for (let i = state.words.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = state.words[i];
+            state.words[i] = state.words[j];
+            state.words[j] = tmp;
+          }
+          state.wordIndex = 0;
+          resetCurrentWordState();
+          renderWordMode();
+          setFeedback('Palavras misturadas! Clique na imagem para ouvir.', 'default');
+          speakText(getCurrentWord().intro, { pulseEl: document.getElementById('btn-picture-speak') });
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (state.mode !== 'words') return;
+          if (e.target && (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')) return;
+
+          if (e.key === 'Backspace') {
+            e.preventDefault();
+            handleBackspace();
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (state.wordJustSolved) {
+              goToWord(1);
+            } else {
+              checkCurrentWord();
+            }
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            state.activeSlot = Math.max(0, state.activeSlot - 1);
+            renderWordMode();
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            state.activeSlot = Math.min(3, state.activeSlot + 1);
+            renderWordMode();
+          } else if (e.key === ' ') {
+            e.preventDefault();
+            speakText(getCurrentWord().intro, { pulseEl: document.getElementById('btn-picture-speak') });
+          } else if (/^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            e.preventDefault();
+            inputLetter(e.key);
+          }
+        });
+      }
+
+      // Inicialização
+      initSyllablesGrids();
+      initWordKeyboard();
+      bindEvents();
+      renderSyllablesMode(false);
+    })();
+  </script>
+</body>
+</html>
