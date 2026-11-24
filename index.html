@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#2E9A96" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Sílabas Richard" />
   <title>Mundo das Sílabas do Richard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -578,6 +581,11 @@
             <button id="btn-speed" type="button" class="header-pill-btn flex items-center gap-1 bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-extrabold text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl transition cursor-pointer" title="Alterar velocidade da voz">
               <span id="speed-icon" aria-hidden="true">🐇</span>
               <span id="speed-label" class="hidden sm:inline">Normal</span>
+            </button>
+
+            <button id="btn-install-pwa" type="button" class="hidden header-pill-btn btn-3d items-center gap-1 bg-[#2E9A96] hover:bg-[#227C78] text-white font-extrabold text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl transition cursor-pointer shadow-sm" title="Instalar como aplicativo na tela inicial ou área de trabalho">
+              <span aria-hidden="true">📲</span>
+              <span>Instalar App</span>
             </button>
 
             <button id="btn-sfx" type="button" class="header-pill-btn flex items-center gap-1 bg-[#F4EFE4] hover:bg-[#EAE2D3] text-[#1E2D40] font-extrabold text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl transition cursor-pointer" title="Ligar ou desligar efeitos sonoros">
@@ -1929,6 +1937,40 @@
           }
         });
       }
+
+      // Instalação PWA (quando hospedado em HTTPS)
+      let deferredInstallPrompt = null;
+      const installBtn = document.getElementById('btn-install-pwa');
+
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        if (installBtn) {
+          installBtn.classList.remove('hidden');
+          installBtn.classList.add('flex');
+        }
+      });
+
+      if (installBtn) {
+        installBtn.addEventListener('click', function () {
+          if (!deferredInstallPrompt) return;
+          sfxPop();
+          deferredInstallPrompt.prompt();
+          deferredInstallPrompt.userChoice.then(function () {
+            deferredInstallPrompt = null;
+            installBtn.classList.add('hidden');
+            installBtn.classList.remove('flex');
+          });
+        });
+      }
+
+      window.addEventListener('appinstalled', function () {
+        deferredInstallPrompt = null;
+        if (installBtn) {
+          installBtn.classList.add('hidden');
+          installBtn.classList.remove('flex');
+        }
+      });
 
       // Inicialização
       initSyllablesGrids();
